@@ -1,8 +1,8 @@
 const express = require('express');
-const { getHouses, createHouse } = require('../controllers/houseController');
+const { getHouses, updateHousePoints } = require('../controllers/houseController');
 const router = express.Router();
 
 router.get('/', getHouses);
-router.post('/', createHouse);
+router.put('/:id', updateHousePoints);
 
 module.exports = router;
