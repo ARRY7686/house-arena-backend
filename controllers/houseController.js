@@ -1,5 +1,5 @@
 const House = require("../models/houseModel");
-const { trusted } = require("mongoose");
+// const { trusted } = require("mongoose");
 
 exports.getHouses = async (req, res) => {
   try {
@@ -12,15 +12,38 @@ exports.getHouses = async (req, res) => {
 
 exports.updateHousePoints = async (req, res) => {
   try {
-    // await House.create({
-    //   name: req.body.name,
-    //   totalPoints: req.body.totalPoints,
-    // });
+    const houseUpdates = req.body; 
 
-    // return res.status(201).json({ message: "house Created" });
-    await House.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    return res.status(200).json({ message: "House updated" });
+    if (!Array.isArray(houseUpdates)) {
+      return res.status(400).json({ message: "Invalid input format" });
+    }
+
+    const updateResults = [];
+
+    for (const houseUpdate of houseUpdates) {
+      const { id, points } = houseUpdate;
+
+      if (!id || typeof points !== 'number' || points < 0) {
+        updateResults.push({ id, status: "failed", message: "Invalid id or points value" });
+        continue;
+      }
+
+      const updatedHouse = await House.findByIdAndUpdate(
+        id, 
+        { points }, 
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedHouse) {
+        updateResults.push({ id, status: "failed", message: "House not found" });
+      } else {
+        updateResults.push({ id, status: "success", house: updatedHouse });
+      }
+    }
+
+    return res.status(200).json({ message: "House updates processed", results: updateResults });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    console.error(error + "chla hi nhi update house"); // Log the error for debugging purposes
+    return res.status(500).json({ message: "Server error" });
   }
 };
