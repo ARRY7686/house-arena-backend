@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
     email: {
         type: String,
         required: true,
@@ -14,20 +10,20 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    role: {
+    scaler_id: {
+        type: Number,
+        required: false
+    },
+    house: {
         type: String,
-        enum: ['admin', 'user', 'partner'],
-        required: true,
-        default: 'user'
+        required: true
     },
-    otp: {
-        type: String
-    },
-    otpExpiry: {
-        type: Date
+    leetcode_id: {
+        type: String,
+        required: false
     },
 }, { timestamps: true });
 
-const Users = mongoose.model('User', userSchema);
+const Users = mongoose.model('Users', userSchema);
 
 module.exports = Users;
