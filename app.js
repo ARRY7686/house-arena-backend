@@ -1,5 +1,5 @@
 const express = require("express");
-const dotenv = require("dotenv");
+const dotenv = require("dotenv").config();
 const morgan = require("morgan");
 const connectDB = require("./config/db");
 const houseRoutes = require("./routes/houseRoutes");
@@ -7,7 +7,7 @@ const eventRoutes = require("./routes/eventRoutes");
 const userRoutes = require("./routes/userRoutes");
 const errorHandler = require("./middlewares/errorHandler");
 
-dotenv.config();
+// dotenv.config();
 
 const app = express();
 

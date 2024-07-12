@@ -6,22 +6,32 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    name: {
+        type: String,
+        required: true
+    },
     password: {
         type: String,
         required: true
     },
     scaler_id: {
-        type: Number,
-        required: false
+        type: Number
+    },
+    admin: {
+        type: Boolean,
+        default: false
     },
     house: {
-        type: String,
-        required: true
+        type: String
     },
     leetcode_id: {
-        type: String,
-        required: false
+        type: String
     },
+    userType: {
+        type: String,
+        enum: ['student', 'employee'],
+        required: true
+    }
 }, { timestamps: true });
 
 const Users = mongoose.model('Users', userSchema);

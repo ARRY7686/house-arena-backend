@@ -19,3 +19,7 @@ exports.createEvent = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+exports.updateEvent = async (req, res) => {};
+
+exports.deleteEvent = async (req, res) => {};
