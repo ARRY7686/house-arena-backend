@@ -6,11 +6,11 @@ const houseRoutes = require("./routes/houseRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const userRoutes = require("./routes/userRoutes");
 const errorHandler = require("./middlewares/errorHandler");
-
+const cors = require("cors");
 // dotenv.config();
 
 const app = express();
-
+app.use(cors());
 connectDB();
 
 app.use(express.json());
