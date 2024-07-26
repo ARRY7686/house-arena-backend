@@ -18,7 +18,9 @@ export async function createEvent(req, res) {
   }
 
   if (!date || !isValid(parseISO(date)) || date.length != 10) {
-    return res.status(400).json({ message: "Invalid or missing date or Wrong Formate (YYYY-MM-DD)" });
+    return res.status(400).json({
+      message: "Invalid or missing date or Wrong Formate (YYYY-MM-DD)",
+    });
   }
 
   if (
@@ -42,18 +44,39 @@ export async function createEvent(req, res) {
 }
 
 export async function updateEvent(req, res) {
-  try {
-    const eventId = req.params.id;
-    const { date, housePoints, name, description } = req.body;
 
+  const eventId = req.params.id;
+  const { date, housePoints, name, description } = req.body;
+  
+  if (!name || typeof name !== "string") {
+    return res.status(400).json({ message: "Invalid or missing name" });
+  }
+
+  if (date && (!isValid(parseISO(date)) || date.length != 10)) {
+    return res.status(400).json({
+      message: "Invalid or missing date or Wrong Formate (YYYY-MM-DD)",
+    });
+  }
+
+  if (
+    !housePoints ||
+    typeof housePoints !== "object" ||
+    !Number.isInteger(housePoints.kong) ||
+    !Number.isInteger(housePoints.leo) ||
+    !Number.isInteger(housePoints.phoenix) ||
+    !Number.isInteger(housePoints.tusker)
+  ) {
+    return res.status(400).json({ message: "Invalid or missing housePoints" });
+  }
+  try {
     // Find the event by ID
     let event = await Event.findById(eventId);
     if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
+      return res.status(404).json({ message: "Event not found" });
     }
 
     // Update the event fields
-    if ('date' in req.body) event.date = date;
+    if ("date" in req.body) event.date = date;
     if (housePoints) event.housePoints = housePoints;
     if (name) event.name = name;
     if (description) event.description = description;
@@ -64,8 +87,22 @@ export async function updateEvent(req, res) {
     // Send the updated event as the response
     res.status(200).json(event);
   } catch (error) {
-    res.status(500).json({ message: 'Server error: ', error: error.message });
+    res.status(500).json({ message: "Server error: ", error: error.message });
   }
 }
 
-export async function deleteEvent(req, res) {}
+export async function deleteEvent(req, res) {
+  const { id } = req.params;
+
+  try {
+    const event = await Event.findByIdAndDelete(id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    return res.status(200).json({ message: 'Event deleted successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error', error });
+  }
+}
