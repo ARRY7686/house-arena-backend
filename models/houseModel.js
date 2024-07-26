@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const HouseSchema = new mongoose.Schema({
+const HouseSchema = new Schema({
   name: { type: String, required: true },
   totalPoints: { type: Number, required: true, default: 0 },
 });
 
-module.exports = mongoose.model('House', HouseSchema);
+export default model('House', HouseSchema);

@@ -1,7 +1,6 @@
 const Users = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-require("dotenv").config();
 const nodemailer = require("nodemailer");
 const otpStore = {};
 
