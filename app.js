@@ -1,7 +1,6 @@
 import express, { json } from "express";
 import morgan from "morgan";
 import connectDB from "./config/db.js";
-import houseRoutes from "./routes/houseRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 // import userRoutes from "./routes/userRoutes.js";
 import errorHandler from "./middlewares/errorHandler.js";
