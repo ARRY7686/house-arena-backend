@@ -5,7 +5,7 @@ const EventSchema = new Schema({
   date: {
     type: Date,
     required: false,
-    default: Date.now},
+    default: null},
   housePoints: {
     kong: { type: Number, required: true },
     leo: { type: Number, required: true },

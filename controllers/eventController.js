@@ -17,9 +17,9 @@ export async function createEvent(req, res) {
     return res.status(400).json({ message: "Invalid or missing name" });
   }
 
-  if (!date || !isValid(parseISO(date)) || date.length != 10) {
+  if (date && (!isValid(parseISO(date)) || date.length != 10)) {
     return res.status(400).json({
-      message: "Invalid or missing date or Wrong Formate (YYYY-MM-DD)",
+      message: "Invalid / Missing date or Wrong Formate (YYYY-MM-DD)",
     });
   }
 
@@ -44,10 +44,9 @@ export async function createEvent(req, res) {
 }
 
 export async function updateEvent(req, res) {
-
   const eventId = req.params.id;
   const { date, housePoints, name, description } = req.body;
-  
+
   if (!name || typeof name !== "string") {
     return res.status(400).json({ message: "Invalid or missing name" });
   }
@@ -98,11 +97,11 @@ export async function deleteEvent(req, res) {
     const event = await Event.findByIdAndDelete(id);
 
     if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
+      return res.status(404).json({ message: "Event not found" });
     }
 
-    return res.status(200).json({ message: 'Event deleted successfully' });
+    return res.status(200).json({ message: "Event deleted successfully" });
   } catch (error) {
-    return res.status(500).json({ message: 'Server error', error });
+    return res.status(500).json({ message: "Server error", error });
   }
 }
