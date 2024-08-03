@@ -27,11 +27,6 @@ const userSchema = new Schema({
     leetcode_id: {
         type: String
     },
-    userType: {
-        type: String,
-        enum: ['student', 'employee'],
-        required: true
-    }
 }, { timestamps: true });
 
 const Users = model('Users', userSchema);

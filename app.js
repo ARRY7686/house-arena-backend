@@ -8,10 +8,11 @@ import cors from "cors";
 
 const app = express();
 app.use(cors());
+app.use(morgan("dev"));
+
 connectDB();
 
 app.use(json());
-app.use(morgan("dev"));
 
 app.use("/api/events", eventRoutes);
 app.use("/api/users", userRoutes);

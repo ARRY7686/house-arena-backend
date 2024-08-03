@@ -58,9 +58,9 @@ export async function verify_otp(req, res) {
 
 export async function registerUser(req, res) {
   try {
-    const userExists = await findOne({ email: req.body.email });
+    const userExists = await Users.findOne({ email: req.body.email });
     if (userExists) {
-      res.send({
+      return res.send({
         success: false,
         message: "user already exists",
       });
