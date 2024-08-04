@@ -10,6 +10,6 @@ import {
 router.post("/register/otp/send_otp", send_otp);
 router.post("/register/otp/verify_otp", verify_otp);
 router.post("/register", registerUser);
-router.get("/login", loginUser);
+router.post("/login", loginUser);
 
 export default router;

@@ -3,6 +3,7 @@ import OTP from "../models/otpmodel.js";
 import { genSalt, hash, compare } from "bcrypt";
 import { randomBytes } from "crypto";
 import { transporter } from "../config/email.js";
+import jwt from "jsonwebtoken";
 
 export async function send_otp(req, res) {
   try {
@@ -56,28 +57,6 @@ export async function verify_otp(req, res) {
   }
 }
 
-// export async function registerUser(req, res) {
-//   try {
-//     const userExists = await Users.findOne({ email: req.body.email });
-//     if (userExists) {
-//       return res.send({
-//         success: false,
-//         message: "user already exists",
-//       });
-//     }
-
-//     const salt = await genSalt(10);
-//     const hashedpass = await hash(req.body.password, salt);
-//     req.body.password = hashedpass;
-
-//     const newUser = new Users(req.body);
-//     await newUser.save();
-//     res.json({ success: true , message: "User registered successfully" });
-//   } catch (error) {
-//     res.status(500).json({ error: `error while signup -> ${error}` });
-//   }
-// }
-
 export async function registerUser(req, res) {
   try {
     console.log("Request body:", req.body); // Log the request body
@@ -112,25 +91,40 @@ export async function registerUser(req, res) {
 }
 
 export async function loginUser(req, res) {
-  const user = await findOne({ email: req.body.email });
+  try {
+    const user = await Users.findOne({ email: req.body.email });
 
-  if (!user) {
+    if (!user) {
+      res.send({
+        success: false,
+        message: "user not found",
+      });
+    }
+
+    const validPass = await compare(req.body.password, user.password);
+
+    if (!validPass) {
+      res.send({
+        success: false,
+        message: "invalid password",
+      });
+    }
+
+    const token = jwt.sign({
+      email: user.email,
+      name: user.name,
+    }, process.env.TOKEN_SECRET);
+
     res.send({
-      success: false,
-      message: "user not found",
+      success: true,
+      message: "login successfull",
+      token,
+      user
     });
+  } catch (error) {
+    console.error("Error in loginUser function:", error); // Log the error
+    res
+      .status(500)
+      .json({ success: false, error: `error while login -> ${error}` });
   }
-
-  const validPass = await compare(req.body.password, user.password);
-
-  if (!validPass) {
-    res.send({
-      success: false,
-      message: "invalid password",
-    });
-  }
-  res.send({
-    success: true,
-    message: "login successfull",
-  });
 }
