@@ -9,7 +9,7 @@ export async function send_otp(req, res) {
     const { email } = req.body;
     const otp = randomBytes(3).toString("hex");
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: "housearena.sam@gmail.com",
       to: email,
       subject: "OTP Code for House arena registration",
       html: `<p>Your OTP code is <strong>${otp}</strong>, will expire in 5 mins</p> <br> <p>Use this code to verify your email address</p><br><p>Having trouble? Contact us by replying to <a href="mailto:${process.env.EMAIL_USER}">${process.env.EMAIL_USER}</a></p>`,
@@ -43,7 +43,7 @@ export async function verify_otp(req, res) {
 
     if (otpRecord) {
       // OTP matches
-      await OTP.deleteOne({ email, otp }); // Clear OTP after verification
+      await OTP.deleteOne({ email, otp });
       res
         .status(200)
         .send({ success: true, message: "OTP verified successfully" });
@@ -56,8 +56,32 @@ export async function verify_otp(req, res) {
   }
 }
 
+// export async function registerUser(req, res) {
+//   try {
+//     const userExists = await Users.findOne({ email: req.body.email });
+//     if (userExists) {
+//       return res.send({
+//         success: false,
+//         message: "user already exists",
+//       });
+//     }
+
+//     const salt = await genSalt(10);
+//     const hashedpass = await hash(req.body.password, salt);
+//     req.body.password = hashedpass;
+
+//     const newUser = new Users(req.body);
+//     await newUser.save();
+//     res.json({ success: true , message: "User registered successfully" });
+//   } catch (error) {
+//     res.status(500).json({ error: `error while signup -> ${error}` });
+//   }
+// }
+
 export async function registerUser(req, res) {
   try {
+    console.log("Request body:", req.body); // Log the request body
+
     const userExists = await Users.findOne({ email: req.body.email });
     if (userExists) {
       return res.send({
@@ -67,13 +91,22 @@ export async function registerUser(req, res) {
     }
 
     const salt = await genSalt(10);
+    console.log("Generated salt:", salt); // Log the generated salt
+    console.log("Request body:", req.body.password); // Log the request body
+    if (!req.body.password) {
+      throw new Error("Password is missing in the request body");
+    }
+
     const hashedpass = await hash(req.body.password, salt);
+    console.log("Hashed password:", hashedpass); // Log the hashed password
+
     req.body.password = hashedpass;
 
     const newUser = new Users(req.body);
     await newUser.save();
-    res.json({ message: "User registered successfully" });
+    res.json({ success: true, message: "User registered successfully" });
   } catch (error) {
+    console.error("Error in registerUser function:", error); // Log the error
     res.status(500).json({ error: `error while signup -> ${error}` });
   }
 }
