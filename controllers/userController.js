@@ -95,7 +95,7 @@ export async function loginUser(req, res) {
     const user = await Users.findOne({ email: req.body.email });
 
     if (!user) {
-      res.send({
+      return res.status(404).send({
         success: false,
         message: "user not found",
       });
@@ -104,22 +104,26 @@ export async function loginUser(req, res) {
     const validPass = await compare(req.body.password, user.password);
 
     if (!validPass) {
-      res.send({
+      return res.status(401).send({
         success: false,
         message: "invalid password",
       });
     }
 
     const token = jwt.sign({
-      email: user.email,
-      name: user.name,
-    }, process.env.TOKEN_SECRET);
+      user: user,
+    }, process.env.TOKEN_SECRET,{
+      expiresIn: "1 days",
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+    });
 
     res.send({
       success: true,
       message: "login successfull",
-      token,
-      user
     });
   } catch (error) {
     console.error("Error in loginUser function:", error); // Log the error

@@ -17,12 +17,26 @@ const userSchema = new Schema({
     scaler_id: {
         type: Number
     },
-    admin: {
-        type: Boolean,
-        default: false
+    userType: {
+        type: String,
+        enum: ['student', 'scalerEmployee'],
+        required: true
+    },
+    role: {
+        type: String,
+        enum: ['superadmin', 'admin', 'user'],
+        default: 'user'
     },
     house: {
-        type: String
+        name: {
+            type: String,
+            required: true
+        },
+        role: {
+            type: String,
+            enum: ['member', 'core'],
+            default: 'member'
+        }
     },
     leetcode_id: {
         type: String
