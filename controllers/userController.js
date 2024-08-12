@@ -4,6 +4,7 @@ import { genSalt, hash, compare } from "bcrypt";
 import { randomBytes } from "crypto";
 import { transporter } from "../config/email.js";
 import jwt from "jsonwebtoken";
+import AdminEmail from "../models/adminEmailsModel.js";
 
 export async function send_otp(req, res) {
   try {
@@ -59,7 +60,15 @@ export async function verify_otp(req, res) {
 
 export async function registerUser(req, res) {
   try {
-    console.log("Request body:", req.body); // Log the request body
+    // console.log("Request body:", req.body); // Log the request body
+
+    const isAdminEmail = await AdminEmail.findOne({ email: req.body.email });
+    if (!isAdminEmail) {
+      return res.send({
+        success: false,
+        message: "tum to admin nahi ho! Lagta hai coding assignments zyada ho gaye."
+      });
+    }
 
     const userExists = await Users.findOne({ email: req.body.email });
     if (userExists) {
@@ -86,7 +95,7 @@ export async function registerUser(req, res) {
     res.json({ success: true, message: "User registered successfully" });
   } catch (error) {
     console.error("Error in registerUser function:", error); // Log the error
-    res.status(500).json({ error: `error while signup -> ${error}` });
+    res.status(500).json({ error: `error while signup -> ${error}`, message: "User registration failed" });
   }
 }
 

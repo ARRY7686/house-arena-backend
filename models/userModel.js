@@ -15,11 +15,7 @@ const userSchema = new Schema({
         required: true
     },
     scaler_id: {
-        type: Number
-    },
-    userType: {
-        type: String,
-        enum: ['student', 'scalerEmployee'],
+        type: Number,
         required: true
     },
     role: {
@@ -28,19 +24,26 @@ const userSchema = new Schema({
         default: 'user'
     },
     house: {
-        name: {
-            type: String,
-            required: true
-        },
-        role: {
-            type: String,
-            enum: ['member', 'core'],
-            default: 'member'
-        }
+        type: String,
+        default: 'none'
     },
-    leetcode_id: {
-        type: String
-    },
+    // userType: {
+    //     type: String,
+    //     enum: ['student', 'scalerEmployee'],
+    //     required: true
+    // },
+    // house: {
+    //     name: {
+    //         type: String,
+    //         required: true
+    //     },
+    //     role: {
+    //         type: String,
+    //         enum: ['member', 'core'],
+    //         default: 'member'
+    //     }
+    // },
+    
 }, { timestamps: true });
 
 const Users = model('Users', userSchema);
