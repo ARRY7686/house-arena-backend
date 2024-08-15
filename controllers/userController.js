@@ -5,6 +5,7 @@ import { randomBytes } from "crypto";
 import { transporter } from "../config/email.js";
 import jwt from "jsonwebtoken";
 import AdminEmail from "../models/adminEmailsModel.js";
+import exp from "constants";
 
 export async function send_otp(req, res) {
   try {
@@ -101,6 +102,16 @@ export async function registerUser(req, res) {
 
 export async function loginUser(req, res) {
   try {
+    const { email, password } = req.body;
+
+    // Validate request body
+    if (!email || !password) {
+      return res.status(400).send({
+        success: false,
+        message: "Email and password are required",
+      });
+    }
+
     const user = await Users.findOne({ email: req.body.email });
 
     if (!user) {
@@ -110,7 +121,7 @@ export async function loginUser(req, res) {
       });
     }
 
-    const validPass = await compare(req.body.password, user.password);
+    const validPass = await compare(password, user.password);
 
     if (!validPass) {
       return res.status(401).send({
@@ -119,20 +130,25 @@ export async function loginUser(req, res) {
       });
     }
 
+    if (!process.env.TOKEN_SECRET) {
+      throw new Error("TOKEN_SECRET is not set in environment variables");
+    }
+
     const token = jwt.sign({
       user: user,
     }, process.env.TOKEN_SECRET,{
       expiresIn: "1 days",
     });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-    });
+    // res.cookie("jwtLoginToken", token, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production",
+    // });
 
     res.send({
       success: true,
       message: "login successfull",
+      token
     });
   } catch (error) {
     console.error("Error in loginUser function:", error); // Log the error

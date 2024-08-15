@@ -7,7 +7,7 @@ import errorHandler from "./middlewares/errorHandler.js";
 import cors from "cors";
 
 const app = express();
-app.use(cors());
+app.use(cors({}));
 app.use(morgan("dev"));
 
 connectDB();
