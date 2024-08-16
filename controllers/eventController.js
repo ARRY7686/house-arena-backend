@@ -14,11 +14,14 @@ export async function createEvent(req, res) {
   const { name, date, housePoints, description } = req.body;
 
   if (!name || typeof name !== "string") {
-    return res.status(400).json({ message: "Invalid or missing name" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid or missing name" });
   }
 
   if (date && (!isValid(parseISO(date)) || date.length != 10)) {
     return res.status(400).json({
+      success: false,
       message: "Invalid / Missing date or Wrong Formate (YYYY-MM-DD)",
     });
   }
@@ -31,15 +34,17 @@ export async function createEvent(req, res) {
     !Number.isInteger(housePoints.phoenix) ||
     !Number.isInteger(housePoints.tusker)
   ) {
-    return res.status(400).json({ message: "Invalid or missing housePoints" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid or missing housePoints" });
   }
 
   try {
     const newEvent = new Event({ name, date, housePoints, description });
     await newEvent.save();
-    res.status(201).json(newEvent);
+    res.status(201).json({ success: true, newEvent });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 }
 
@@ -91,9 +96,15 @@ export async function updateEvent(req, res) {
     await event.save();
 
     // Send the updated event as the response
-    return res.status(200).json({success: true, event});
+    return res.status(200).json({ success: true, event });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error: ", error: error.message });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Server error: ",
+        error: error.message,
+      });
   }
 }
 
