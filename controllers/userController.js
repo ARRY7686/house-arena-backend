@@ -5,11 +5,24 @@ import { randomBytes } from "crypto";
 import { transporter } from "../config/email.js";
 import jwt from "jsonwebtoken";
 import AdminEmail from "../models/adminEmailsModel.js";
-import exp from "constants";
+
 
 export async function send_otp(req, res) {
   try {
     const { email } = req.body;
+    if (!email) {
+      return res.status(400).send({
+        success: false,
+        message: "Email is required",
+      });
+    }
+    const isUserEmail = await Users.findOne({ email: req.body.email });
+    if (!isUserEmail) {
+      return res.send({
+        success: false,
+        message: "User does not exist, please register first",
+      });
+    }
     const otp = randomBytes(3).toString("hex");
     const mailOptions = {
       from: "housearena.sam@gmail.com",
@@ -42,6 +55,12 @@ export async function send_otp(req, res) {
 export async function verify_otp(req, res) {
   try {
     const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).send({
+        success: false,
+        message: "Email and OTP are required",
+      });
+    }
     const otpRecord = await OTP.findOne({ email, otp });
 
     if (otpRecord) {
@@ -59,6 +78,47 @@ export async function verify_otp(req, res) {
   }
 }
 
+export async function reset_password(req, res) {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).send({
+        success: false,
+        message: "Email and password are required",
+      });
+    }
+    const salt = await genSalt(10);
+    console.log("Generated salt:", salt);
+    console.log("Request body:", req.body.password);
+    if (!req.body.password) {
+      throw new Error("Password is missing in the request body");
+    }
+    const newHashedPassword = await hash(req.body.password, salt);
+    req.body.password = newHashedPassword;
+
+    const user = await Users.findOne({ email });
+
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    user.password = newHashedPassword;
+    await user.save();
+
+    res.send({
+      success: true,
+      message: "Password reset successfully",
+    });
+  } catch (error) {
+    console.error("Error in reset_password function:", error);
+    res
+      .status(500)
+      .send({ success: false, message: "Failed to reset password" });
+  }
+}
 export async function registerUser(req, res) {
   try {
     // console.log("Request body:", req.body); // Log the request body
@@ -67,7 +127,8 @@ export async function registerUser(req, res) {
     if (!isAdminEmail) {
       return res.send({
         success: false,
-        message: "tum to admin nahi ho! Lagta hai coding assignments zyada ho gaye."
+        message:
+          "tum to admin nahi ho! Lagta hai coding assignments zyada ho gaye.",
       });
     }
 
@@ -96,7 +157,10 @@ export async function registerUser(req, res) {
     res.json({ success: true, message: "User registered successfully" });
   } catch (error) {
     console.error("Error in registerUser function:", error); // Log the error
-    res.status(500).json({ error: `error while signup -> ${error}`, message: "User registration failed" });
+    res.status(500).json({
+      error: `error while signup -> ${error}`,
+      message: "User registration failed",
+    });
   }
 }
 
@@ -134,11 +198,15 @@ export async function loginUser(req, res) {
       throw new Error("TOKEN_SECRET is not set in environment variables");
     }
 
-    const token = jwt.sign({
-      user: user,
-    }, process.env.TOKEN_SECRET,{
-      expiresIn: "1 days",
-    });
+    const token = jwt.sign(
+      {
+        user: user,
+      },
+      process.env.TOKEN_SECRET,
+      {
+        expiresIn: "1 days",
+      }
+    );
 
     // res.cookie("jwtLoginToken", token, {
     //   httpOnly: true,
