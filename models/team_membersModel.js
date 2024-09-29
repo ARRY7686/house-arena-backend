@@ -29,4 +29,4 @@ const team_membersSchema = new Schema({
     }
 });
 
-export default model("team_members_get", team_membersSchema);
+export default model("team_members", team_membersSchema);
