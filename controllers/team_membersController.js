@@ -36,7 +36,7 @@ export async function addTeamMember(req, res) {
             });
         }
 
-        const new_team_member = new team_members_get(data);
+        const new_team_member = new team_members(data);
         await new_team_member.save();
 
         res.status(201).json({ success: true, message: "New team member added successfully" });
@@ -65,13 +65,13 @@ export async function addTeamMember(req, res) {
 
 export async function get_team_members(req, res) {
     try {
-        const team_members = await team_members_get.find();
+        const team_members_ = await team_members.find();
 
-        if (!team_members || team_members.length === 0) {
+        if (!team_members_ || team_members_.length === 0) {
             return res.status(204).json({ success: true, message: "No team members found." });
         }
 
-        res.status(200).json({ success: true, team_members });
+        res.status(200).json({ success: true, team_members_ });
     } catch (e) {
         console.error("Error fetching team members: ", e.message);
 

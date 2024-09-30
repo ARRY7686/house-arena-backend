@@ -8,17 +8,20 @@ import cors from "cors";
 import team_membersRoutes from "./routes/team_membersRoutes.js"
 
 const app = express();
+
+
 app.use(cors({}));
 app.use(morgan("dev"));
-
-connectDB();
-
 app.use(json());
-
 app.use("/api/events", eventRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/team_members", team_membersRoutes);
-
 app.use(errorHandler);
+
+connectDB();
+
+
+
+
 
 export default app;

@@ -98,13 +98,11 @@ export async function updateEvent(req, res) {
     // Send the updated event as the response
     return res.status(200).json({ success: true, event });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Server error: ",
-        error: error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Server error: ",
+      error: error.message,
+    });
   }
 }
 
